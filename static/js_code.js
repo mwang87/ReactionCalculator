@@ -35,6 +35,7 @@ function render_reactants(reactant_list, div_name){
 
 
     reactant_header.appendChild(document.createElement("th"))
+    reactant_header.appendChild(document.createElement("th"))
     //Additional Labels
     formula_header = document.createElement("th")
     formula_header.innerHTML = "Formula"
