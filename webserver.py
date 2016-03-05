@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, redirect, url_for, send_file, render_template
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 
 @app.route('/', methods=['GET'])

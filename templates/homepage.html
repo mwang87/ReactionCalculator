@@ -1,1 +1,17 @@
-MING HOMEPAGE`
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Equation balancer</title>
+    <script src="/static/jquery-2.2.1.min.js"></script>
+    <script src="/static/js_code.js"></script>
+    <script src="/static/molecular_formula_util.js"></script>
+  </head>
+  <body onload="init()">
+      <div id="reactants">
+      </div>
+      <button type="button" onclick="add_reactant()">Add Reactant</button>
+      <button type="button" onclick="refresh()">Refresh</button>
+      <button type="button" onclick="calculate()">Calculate</button>
+      <button type="button" onclick="clear_masses()">Clear Masses</button>
+  </body>
+</html>
