@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, redirect, url_for, send_file, render_template
 import json
+import requests
 
 app = Flask(__name__, static_folder='static')
 
@@ -9,10 +10,19 @@ app = Flask(__name__, static_folder='static')
 def renderhomepage():
     return render_template('homepage.html')
 
-@app.route('/testapi', methods=['GET'])
-def testapi():
+@app.route('/castoformula', methods=['GET'])
+def casToFormula():
+    cas_number = request.args.get("cas")
+    if(len(cas_number) > 0):
+        r = requests.get("http://cactus.nci.nih.gov/chemical/structure/" + cas_number + "/formula")
+        return_obj = {}
+        return_obj["status"] = "success"
+        return_obj["formula"] = r.text
+        return json.dumps(return_obj)
+
+
     return_obj = {}
-    return_obj["status"] = "success"
+    return_obj["status"] = "error"
     return json.dumps(return_obj)
 
 

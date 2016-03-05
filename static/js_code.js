@@ -98,8 +98,36 @@ function render_reactants(reactant_list, div_name){
             }
         }(i, reactant_list)
 
+        //Button to enter cas
+        cas_button = document.createElement("BUTTON");
+        cas_button.innerHTML = "Enter CAS"
+        cas_button.onclick = function(index, reactant_list){
+            return function(){
+                cas_number = prompt("ENTER THE CAS!", "Harry Potter");
+
+                $.ajax({
+                    url: "/castoformula",
+                        method: "GET",
+                        data: { cas : cas_number },
+                        success: function(i, reactant_list){
+                            return function(json){
+                                return_obj = JSON.parse(json)
+                                if(return_obj.status == "success"){
+                                    save_reactants(reactant_list);
+                                    reactant_list[i].formula = return_obj.formula
+                                    render_reactants(reactant_list, "reactants")
+                                }
+                            }
+                        }(i, reactant_list)
+                    });
+
+
+            }
+        }(i, reactant_list)
+
 
         reactant_row.appendChild(create_td_object(delete_button))
+        reactant_row.appendChild(create_td_object(cas_button))
         reactant_row.appendChild(create_td_object(formula_input))
         reactant_row.appendChild(create_td_object(equivalents_input))
         reactant_row.appendChild(create_td_object(mass_input))
