@@ -120,7 +120,6 @@ function render_reactants(reactant_list, div_name){
             return function(){
                 save_reactants(reactant_list);
                 reactant_list.splice(index, 1);
-                calculate()
                 render_reactants(reactant_list, "reactants")
             }
         }(i, reactant_list)
