@@ -118,6 +118,7 @@ function render_reactants(reactant_list, div_name){
         weight_percentage_input.id = i.toString() + "_weight_percentage"
         weight_percentage_input.className = "form-control"
         weight_percentage_input.size = "10"
+        weight_percentage_input.placeholder = "Default: 1.0"
         weight_percentage_input.onchange = refresh
 
         if(reactant_list[i].weight_percentage != null){
@@ -176,6 +177,7 @@ function render_reactants(reactant_list, div_name){
         cas_input.id = i.toString() + "_cas"
         cas_input.className = "form-control"
         cas_input.size = "10"
+        cas_input.placeholder = "CAS Number"
 
         if(reactant_list[i].cas != null){
             cas_input.value = reactant_list[i].cas
