@@ -51,6 +51,9 @@ function render_reactants(reactant_list, div_name){
     equivalent_header = document.createElement("th")
     equivalent_header.innerHTML = "Equivalent"
 
+    weight_percent_header = document.createElement("th")
+    weight_percent_header.innerHTML = "Weight Fraction"
+
     mass_header = document.createElement("th")
     mass_header.innerHTML = "Mass (g)"
 
@@ -60,13 +63,25 @@ function render_reactants(reactant_list, div_name){
     calculatedmass_header = document.createElement("th")
     calculatedmass_header.innerHTML = "Calculated Mass (g)"
 
+    calculatedvolume_header = document.createElement("th")
+    calculatedvolume_header.innerHTML = "Volume (L)"
+
+    density_header = document.createElement("th")
+    density_header.innerHTML = "Density (g/L)"
+
+    molarity_header = document.createElement("th")
+    molarity_header.innerHTML = "Molarity (mol/L)"
 
     reactant_header.appendChild(cas_header)
     reactant_header.appendChild(formula_header)
     reactant_header.appendChild(equivalent_header)
+    reactant_header.appendChild(weight_percent_header)
     reactant_header.appendChild(mass_header)
+    reactant_header.appendChild(density_header)
+    reactant_header.appendChild(molarity_header)
     reactant_header.appendChild(molarmass_header)
     reactant_header.appendChild(calculatedmass_header)
+    reactant_header.appendChild(calculatedvolume_header)
 
     reactant_tbody = document.createElement("tbody")
     reactant_table.appendChild(reactant_tbody)
@@ -98,6 +113,17 @@ function render_reactants(reactant_list, div_name){
             equivalents_input.value = reactant_list[i].equivalent
         }
 
+        weight_percentage_input = document.createElement("input");
+        weight_percentage_input.setAttribute("type", "text");
+        weight_percentage_input.id = i.toString() + "_weight_percentage"
+        weight_percentage_input.className = "form-control"
+        weight_percentage_input.size = "10"
+        weight_percentage_input.onchange = refresh
+
+        if(reactant_list[i].weight_percentage != null){
+            weight_percentage_input.value = reactant_list[i].weight_percentage
+        }
+
         mass_input = document.createElement("input");
         mass_input.setAttribute("type", "text");
         mass_input.id = i.toString() + "_mass"
@@ -106,6 +132,26 @@ function render_reactants(reactant_list, div_name){
 
         if(reactant_list[i].mass != null){
             mass_input.value = reactant_list[i].mass
+        }
+
+        density_input = document.createElement("input");
+        density_input.setAttribute("type", "text");
+        density_input.id = i.toString() + "_density"
+        density_input.className = "form-control"
+        density_input.size = "10"
+
+        if(reactant_list[i].density != null){
+            density_input.value = reactant_list[i].density
+        }
+
+        molarity_input = document.createElement("input");
+        molarity_input.setAttribute("type", "text");
+        molarity_input.id = i.toString() + "_molarity"
+        molarity_input.className = "form-control"
+        molarity_input.size = "10"
+
+        if(reactant_list[i].molarity != null){
+            molarity_input.value = reactant_list[i].molarity
         }
 
         molar_mass = document.createElement("span");
@@ -203,6 +249,13 @@ function render_reactants(reactant_list, div_name){
             calculated_mass.innerHTML = reactant_list[i].calculated_mass.toFixed(2)
         }
 
+        //Calculated Volume
+        calculated_volume = document.createElement("span");
+        calculated_volume.id = i.toString() + "_calculated_volume"
+        if(reactant_list[i].calculated_volume != null){
+            calculated_volume.innerHTML = reactant_list[i].calculated_volume.toFixed(3)
+        }
+
 
 
         reactant_row.appendChild(create_td_object(delete_button))
@@ -211,9 +264,13 @@ function render_reactants(reactant_list, div_name){
         reactant_row.appendChild(create_td_object(cas_input))
         reactant_row.appendChild(create_td_object(formula_input))
         reactant_row.appendChild(create_td_object(equivalents_input))
+        reactant_row.appendChild(create_td_object(weight_percentage_input))
         reactant_row.appendChild(create_td_object(mass_input))
+        reactant_row.appendChild(create_td_object(density_input))
+        reactant_row.appendChild(create_td_object(molarity_input))
         reactant_row.appendChild(create_td_object(molar_mass))
         reactant_row.appendChild(create_td_object(calculated_mass))
+        reactant_row.appendChild(create_td_object(calculated_volume))
 
         reactant_tbody.appendChild(reactant_row)
     }
@@ -239,10 +296,11 @@ function save_reactants(reactant_list){
         reactant_object.equivalent = $("#" + i.toString() + "_equivalent").val()
         reactant_object.mass = $("#" + i.toString() + "_mass").val()
         reactant_object.cas = $("#" + i.toString() + "_cas").val()
+        reactant_object.weight_percentage = $("#" + i.toString() + "_weight_percentage").val()
+        reactant_object.density = $("#" + i.toString() + "_density").val()
+        reactant_object.molarity = $("#" + i.toString() + "_molarity").val()
 
         reactant_list[i] = reactant_object
-
-        console.log($("#" + i.to_string + "_formula").val())
     }
 
 }
@@ -291,9 +349,28 @@ function calculate(){
         reactant_formula = $("#" + j.toString() + "_formula").val()
         mass_of_formula = calculate_formula_mass(reactant_formula)
         reactant_equivalent = parseFloat($("#" + j.toString() + "_equivalent").val())
+        weight_percentage = 1.0
+        try{
+            weight_percentage = parseFloat($("#" + j.toString() + "_weight_percentage").val())
+            if(isNaN(weight_percentage)){
+                weight_percentage = 1.0
+            }
+        }
+        catch(err){}
 
-        reactant_mass = normalized_limiting_equivalent_mol_number * mass_of_formula * reactant_equivalent
+
+        reactant_mass = normalized_limiting_equivalent_mol_number * mass_of_formula * reactant_equivalent / weight_percentage
         reactant_list[j].calculated_mass = reactant_mass
+
+        //Calculating volume
+        try{
+            reactant_list[j].calculated_volume = reactant_mass / parseFloat(reactant_list[j].density)
+            if(isNaN(reactant_list[j].calculated_volume)){
+                reactant_list[j].calculated_volume = normalized_limiting_equivalent_mol_number * reactant_equivalent / weight_percentage / parseFloat(reactant_list[j].molarity)
+            }
+        }
+        catch(err){}
+
     }
 
     render_reactants(reactant_list, "reactants")
