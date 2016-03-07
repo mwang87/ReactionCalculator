@@ -79,6 +79,8 @@ function render_reactants(reactant_list, div_name){
         formula_input = document.createElement("input");
         formula_input.setAttribute("type", "text");
         formula_input.id = i.toString() + "_formula"
+        formula_input.className = "form-control"
+        formula_input.size = "10"
         formula_input.onchange = refresh
 
         if(reactant_list[i].formula != null){
@@ -88,6 +90,8 @@ function render_reactants(reactant_list, div_name){
         equivalents_input = document.createElement("input");
         equivalents_input.setAttribute("type", "text");
         equivalents_input.id = i.toString() + "_equivalent"
+        equivalents_input.className = "form-control"
+        equivalents_input.size = "10"
         formula_input.onchange = refresh
 
         if(reactant_list[i].equivalent != null){
@@ -97,6 +101,8 @@ function render_reactants(reactant_list, div_name){
         mass_input = document.createElement("input");
         mass_input.setAttribute("type", "text");
         mass_input.id = i.toString() + "_mass"
+        mass_input.className = "form-control"
+        mass_input.size = "10"
 
         if(reactant_list[i].mass != null){
             mass_input.value = reactant_list[i].mass
@@ -123,6 +129,8 @@ function render_reactants(reactant_list, div_name){
         cas_input = document.createElement("input");
         cas_input.setAttribute("type", "text");
         cas_input.id = i.toString() + "_cas"
+        cas_input.className = "form-control"
+        cas_input.size = "10"
 
         if(reactant_list[i].cas != null){
             cas_input.value = reactant_list[i].cas
