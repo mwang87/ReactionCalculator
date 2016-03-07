@@ -30,13 +30,20 @@ function render_reactants(reactant_list, div_name){
 
     //Boiler plate for table and headers
     reactant_table = document.createElement("table")
+    reactant_table.className = "table table-striped"
+
+    reactant_thead = document.createElement("thead")
     reactant_header = document.createElement("tr")
-    reactant_table.appendChild(reactant_header)
+    reactant_thead.appendChild(reactant_header)
+    reactant_table.appendChild(reactant_thead)
 
 
     reactant_header.appendChild(document.createElement("th"))
     reactant_header.appendChild(document.createElement("th"))
     //Additional Labels
+    cas_header = document.createElement("th")
+    cas_header.innerHTML = "CAS"
+
     formula_header = document.createElement("th")
     formula_header.innerHTML = "Formula"
 
@@ -49,11 +56,19 @@ function render_reactants(reactant_list, div_name){
     molarmass_header = document.createElement("th")
     molarmass_header.innerHTML = "Molar Mass (g/mol)"
 
+    calculatedmass_header = document.createElement("th")
+    calculatedmass_header.innerHTML = "Calculated Mass (g)"
+
+
+    reactant_header.appendChild(cas_header)
     reactant_header.appendChild(formula_header)
     reactant_header.appendChild(equivalent_header)
     reactant_header.appendChild(mass_header)
     reactant_header.appendChild(molarmass_header)
+    reactant_header.appendChild(calculatedmass_header)
 
+    reactant_tbody = document.createElement("tbody")
+    reactant_table.appendChild(reactant_tbody)
 
     $("#" + div_name).append(reactant_table)
 
@@ -63,6 +78,7 @@ function render_reactants(reactant_list, div_name){
         formula_input = document.createElement("input");
         formula_input.setAttribute("type", "text");
         formula_input.id = i.toString() + "_formula"
+        formula_input.onchange = refresh
 
         if(reactant_list[i].formula != null){
             formula_input.value = reactant_list[i].formula
@@ -71,6 +87,7 @@ function render_reactants(reactant_list, div_name){
         equivalents_input = document.createElement("input");
         equivalents_input.setAttribute("type", "text");
         equivalents_input.id = i.toString() + "_equivalent"
+        formula_input.onchange = refresh
 
         if(reactant_list[i].equivalent != null){
             equivalents_input.value = reactant_list[i].equivalent
@@ -90,6 +107,7 @@ function render_reactants(reactant_list, div_name){
 
         //Delete Button
         delete_button = document.createElement("BUTTON");
+        delete_button.className = "btn btn-danger"
         delete_button.innerHTML = "Remove"
         delete_button.onclick = function(index, reactant_list){
             return function(){
@@ -99,42 +117,93 @@ function render_reactants(reactant_list, div_name){
             }
         }(i, reactant_list)
 
-        //Button to enter cas
+        //Enter Cas
+        cas_input = document.createElement("input");
+        cas_input.setAttribute("type", "text");
+        cas_input.id = i.toString() + "_cas"
+
+        if(reactant_list[i].cas != null){
+            cas_input.value = reactant_list[i].cas
+        }
+
         cas_button = document.createElement("BUTTON");
-        cas_button.innerHTML = "Enter CAS"
+        cas_button.innerHTML = "Update CAS"
+        cas_button.className = "btn btn-default"
         cas_button.onclick = function(index, reactant_list){
             return function(){
-                cas_number = prompt("ENTER THE CAS!", "Harry Potter");
+                cas_number = $("#" + index.toString() + "_cas").val()
 
                 $.ajax({
                     url: "/castoformula",
                         method: "GET",
                         data: { cas : cas_number },
-                        success: function(i, reactant_list){
+                        success: function(index, reactant_list){
                             return function(json){
                                 return_obj = JSON.parse(json)
                                 if(return_obj.status == "success"){
                                     save_reactants(reactant_list);
-                                    reactant_list[i].formula = return_obj.formula
+                                    reactant_list[index].formula = return_obj.formula
                                     render_reactants(reactant_list, "reactants")
                                 }
                             }
-                        }(i, reactant_list)
+                        }(index, reactant_list)
                     });
 
 
             }
         }(i, reactant_list)
 
+        cas_structure_button = document.createElement("BUTTON");
+        cas_structure_button.innerHTML = "CAS Structure"
+        cas_structure_button.className = "btn btn-default"
+        cas_structure_button.onclick = function(index, reactant_list){
+            return function(){
+                cas_number = $("#" + index.toString() + "_cas").val()
+
+                $.ajax({
+                    url: "/castostructure",
+                        method: "GET",
+                        data: { cas : cas_number },
+                        success: function(index, reactant_list, cas_number){
+                            return function(json){
+                                return_obj = JSON.parse(json)
+                                if(return_obj.status == "success"){
+                                    $("#myModalLabel").empty()
+                                    $("#myModalLabel").append(cas_number + " Structure")
+
+
+                                    $("#modal-body").empty()
+                                    $("#modal-body").append(return_obj.smiles)
+
+                                    cas_image = document.createElement("img");
+                                    cas_image.src = "http://ccms-support.ucsd.edu:5000/smilesstructure?width=500&height=350&smiles=" + return_obj.smiles
+                                    $("#modal-body").append(cas_image)
+
+                                    $("#myModal").modal()
+                                }
+                            }
+                        }(index, reactant_list, cas_number)
+                    });
+            }
+        }(i, reactant_list)
+
+        //Calculated mass
+        calculated_mass = document.createElement("span");
+        calculated_mass.id = i.toString() + "_calculated_mass"
+        calculated_mass.innerHTML = reactant_list[i].calculated_mass
+
 
         reactant_row.appendChild(create_td_object(delete_button))
         reactant_row.appendChild(create_td_object(cas_button))
+        reactant_row.appendChild(create_td_object(cas_structure_button))
+        reactant_row.appendChild(create_td_object(cas_input))
         reactant_row.appendChild(create_td_object(formula_input))
         reactant_row.appendChild(create_td_object(equivalents_input))
         reactant_row.appendChild(create_td_object(mass_input))
         reactant_row.appendChild(create_td_object(molar_mass))
+        reactant_row.appendChild(create_td_object(calculated_mass))
 
-        reactant_table.appendChild(reactant_row)
+        reactant_tbody.appendChild(reactant_row)
     }
 
     //Saving the json of the data
@@ -157,6 +226,7 @@ function save_reactants(reactant_list){
         reactant_object.formula = $("#" + i.toString() + "_formula").val()
         reactant_object.equivalent = $("#" + i.toString() + "_equivalent").val()
         reactant_object.mass = $("#" + i.toString() + "_mass").val()
+        reactant_object.cas = $("#" + i.toString() + "_cas").val()
 
         reactant_list[i] = reactant_object
 
@@ -167,6 +237,7 @@ function save_reactants(reactant_list){
 
 function refresh(){
     save_reactants(reactant_list)
+    calculate()
     render_reactants(reactant_list, "reactants")
 }
 
@@ -212,7 +283,7 @@ function calculate(){
         reactant_equivalent = parseFloat($("#" + j.toString() + "_equivalent").val())
 
         reactant_mass = normalized_limiting_equivalent_mol_number * mass_of_formula * reactant_equivalent
-        reactant_list[j].mass = reactant_mass
+        reactant_list[j].calculated_mass = reactant_mass
     }
 
     render_reactants(reactant_list, "reactants")

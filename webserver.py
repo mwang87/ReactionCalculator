@@ -25,6 +25,20 @@ def casToFormula():
     return_obj["status"] = "error"
     return json.dumps(return_obj)
 
+@app.route('/castostructure', methods=['GET'])
+def casToStructure():
+    cas_number = request.args.get("cas")
+    if(len(cas_number) > 0):
+        r = requests.get("http://cactus.nci.nih.gov/chemical/structure/" + cas_number + "/smiles")
+        return_obj = {}
+        return_obj["status"] = "success"
+        return_obj["smiles"] = r.text
+        return json.dumps(return_obj)
+
+    return_obj = {}
+    return_obj["status"] = "error"
+    return json.dumps(return_obj)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
