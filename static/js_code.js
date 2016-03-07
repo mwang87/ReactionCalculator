@@ -40,6 +40,7 @@ function render_reactants(reactant_list, div_name){
 
     reactant_header.appendChild(document.createElement("th"))
     reactant_header.appendChild(document.createElement("th"))
+    reactant_header.appendChild(document.createElement("th"))
     //Additional Labels
     cas_header = document.createElement("th")
     cas_header.innerHTML = "CAS"
@@ -113,6 +114,7 @@ function render_reactants(reactant_list, div_name){
             return function(){
                 save_reactants(reactant_list);
                 reactant_list.splice(index, 1);
+                calculate()
                 render_reactants(reactant_list, "reactants")
             }
         }(i, reactant_list)
@@ -190,7 +192,10 @@ function render_reactants(reactant_list, div_name){
         //Calculated mass
         calculated_mass = document.createElement("span");
         calculated_mass.id = i.toString() + "_calculated_mass"
-        calculated_mass.innerHTML = reactant_list[i].calculated_mass
+        if(reactant_list[i].calculated_mass != null){
+            calculated_mass.innerHTML = reactant_list[i].calculated_mass.toFixed(2)
+        }
+
 
 
         reactant_row.appendChild(create_td_object(delete_button))
@@ -252,8 +257,6 @@ function add_reactant(){
 function calculate(){
     //Doing the calculation
     save_reactants(reactant_list);
-
-
 
     //Find Limiting reactant entered
     index_of_limiting_reactant = -1
