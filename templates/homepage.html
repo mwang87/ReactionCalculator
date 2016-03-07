@@ -10,10 +10,13 @@
     <link href="/static/reaction.css" rel="stylesheet">
   </head>
   <body onload="init()">
-      <button type="button" onclick="add_reactant()" class="btn btn-default">Add Reactant</button>
-      <button type="button" onclick="refresh()" class="btn btn-default">Refresh</button>
-      <button type="button" onclick="calculate()" class="btn btn-default">Calculate</button>
-      <button type="button" onclick="clear_masses()" class="btn btn-default">Clear Masses</button>
+            <div class="col-md-3 col-md-offset-5">
+                <button type="button" onclick="add_reactant()" class="btn btn-default">Add Reactant</button>
+                <button type="button" onclick="refresh()" class="btn btn-default">Refresh</button>
+                <button type="button" onclick="calculate()" class="btn btn-default">Calculate</button>
+                <button type="button" onclick="clear_masses()" class="btn btn-default">Clear Masses</button>
+            </div>
+
 
       <div id="reactants"></div>
 
